@@ -1,62 +1,99 @@
-/* data-analytics.js	*	@author David Nordlund	*	© Province of Nova Scotia */
-/* Simplify _trackEvent & _link for Google Analytics with unobtrusive javascript.
+/* data-analytics.js  *  @author David Nordlund  *  © Province of Nova Scotia */
+/* Simplify event tracking and cross domain visits for Google Analytics
+ * with unobtrusive javascript.
  * Usage: set data-analytics attributes on html tags.
  * These attributes may contain one or more fields, separated by semi-colons;
  * eg: data-analytics="action=Clicked something;value=8"
  * Fields can be grouped in a single tag, or spread out in the DOM tree.
- * When an element is clicked and enough data-analytics fields are present
- * in that tag or its ancestors, _trackEvent and/or _link will invoked.
- * Fields for _trackEvent are: category, action, label, and value.
- * For sharing analytics over muliple top-level domain names,
- * the domains field is a space-separated list of those shared domains,
- * and matching links will be linked using GA's _link function.
+ * Fields for events are: category, action, label, and value.
+ * eg: <ul data-analytics="category=Special Links;action=Clicked">
+ *      <li><a href="cat.gif" data-analytics="label=Cat photo"><img...></a></li>
+ *      <li><a href="dog.jpg" data-analytics="label=Dog photo"><img...></a></li>
+ *      <li><a href="catsanddogs.pdf" data-analytics="action=Downloaded;label=catsanddogs.pdf">...</a></li>
+ * For sharing analytics over muliple distinct domain names,
+ * the domains field is a space-separated list of those shared domains.
  * To also include subdomains, prefix the domain name with a dot.
  * eg: <body data-analytics="domains=.novascotia.ca .gov.ns.ca">
  */
-(function() {
-
-/* Check clicked elements (& ancestors) for fields in data-analytics attributes.
- * If all the fields required for a trackEvent are found (category,action,label),
- * then track the event.
- * If the element is a link to a shared domain (domains field), _link it via _gaq.
- */
-function clicked(e) {
-	var fields = {}, keycut = /^\s*(\w+)\s*=\s*(.*)\s*$/, a=0,
-	    actiontags = {'A':1, 'AREA':1, 'BUTTON':1, 'INPUT':1};
-	// collect values from data-analytics attributes into fields
-	for (var t = e.target||e.srcElement, attr; t; t = t.parentNode)
-		if (t.nodeType==1) {
-			!a && (t.tagName in actiontags) && (a=t); // keep track of the actionable tag for later
-			if ((attr = t.getAttribute("data-analytics")))
-				for (var d = attr.split(';'), i = d.length, v; i--;)
-					(v=keycut.exec(d[i])) && !(v[1] in fields) && (fields[v[1]]=v[2]);
-		}
-	if (a) {
-		if (fields.category && fields.action && fields.label) {
-			// enough data to record event
-			var te = ['_trackEvent', fields.category, fields.action, fields.label];
-			("value" in fields) && te.push(fields.value-0);
-			_gaq.push(te);
-		}
-		// handle external links to shared analytics domains
-		if (a && a.href && fields.domains && !a.onclick) {
-			for (var sd = fields.domains.split(/ +/), i = sd.length; i--;) {
-				var r = RegExp('^'+sd[i].replace(/[^-\w]+/g, "\\.").replace(/^\\\./, "(.+\\.)?")+'$', 'i');
-				if (r.test(a.hostname) && !r.test(location.hostname)) {
-					// shared external domain
-					if (e.preventDefault) e.preventDefault();
-					else if (window.event) window.event.returnValue = false;
-					_gaq.push(['_link', a.href]);
-					break;
-				}
-			}
+(function(data_analytics) {
+	function clicked(e) {
+		var tag = e.target||e.srcElement;  (tag.nodeType==1)||(tag = t.parentNode);
+		var dav = data_analytics.values(tag);
+		var a, actiontags = {A:1, AREA:1, BUTTON:1}, i, imp;
+		for (a = tag; a && !(a.tagName in actiontags); a = a.parentNode); //a = ancestor action tag
+		if (a) for (i in data_analytics.implementations) {
+			imp = data_analytics.implementations[i];
+			(i in window) && imp.clicked && imp.clicked(e, dav, a);
 		}
 	}
-}
-if (window._gaq) { // don't do anything if _gaq isn't even in the page
+	for (i in data_analytics.implementations) {
+		imp = data_analytics.implementations[i];
+		imp.init && imp.init(data_analytics);
+	}
 	if (document.addEventListener)
 		document.addEventListener("click", clicked, false);
 	else if (document.attachEvent)
 		document.attachEvent("onclick", clicked);
-}
-})();
+})({
+	/** Collect values in data-analytics attributes from a DOM element and its ancestors.
+	 * @param   tag   The DOM element to collect the data-analytics for.
+	 * @return  an object of key:value pairs.
+	 */
+	values: function(tag) {
+		var values={}, attr, t, kv, keycut = /^\s*(\w+)\s*=\s*(.*)\s*$/;
+		for (t=tag; t; t = t.parentNode)  // start with the tag, then go up through its ancestors
+			if ((attr = t.getAttribute("data-analytics"))) // for each "k=v", set values[k]=v
+				for (var fields = attr.split(';'), i = fields.length; i--;) 
+					(kv=keycut.exec(fields[i])) && !(kv[1] in values) && (values[kv[1]]=kv[2]);
+		return values;
+	},
+
+	implementations: {
+		ga: { // Universal Analytics
+			init: function(data_analytics) {
+				var dav = document.body ? data_analytics.values(document.body) : {};
+				if (dav.domains) {
+					var domains = dav.domains.replace(/(^|\s)\./g, ' ').replace(/(^\s+|s+$)/g, '');
+					ga('require', 'linker');
+					ga('linker:autoLink', domains.split(/\s+/));
+				}
+			},
+			clicked: function(e, dav, a) {
+				var keymap = {
+					eventCategory:'category', eventAction:'action', eventLabel:'label', eventValue:'value'
+				};
+				var ga_key, da_key, event = {};
+				for (ga_key in keymap)
+					if ((da_key = keymap[ga_key]) && (da_key in dav))
+						event[ga_key] = dav[da_key];
+				ga('send', 'event', event);
+			}
+		},
+		_gaq: { // old _gaq analytics
+			clicked: function(e, dav, a) {
+				if (dav.category && dav.action && dav.label) {
+					var te = ['_trackEvent', dav.category, dav.action, dav.label];
+					('value' in dav) && te.push(dav.value-0);
+					_gaq.push(te);
+				}
+				if (dav.domains && a.href && a.hostname) {
+					var shared = dav.domains.split(/\s+/);
+					if (this.isSharedExternalDomain(a.hostname, shared)) {
+						if (e.preventDefault) e.preventDefault();
+						else if (window.event) window.event.returnValue = false;
+						_gaq('_link', a.href);
+					}
+				}
+			},
+			isSharedExternalDomain: function(hostname, shared_domain_list) {
+				for (var i = shared_domain_list.length; i--;) {
+					var d = shared_domain_list[i];
+					var r = RegExp('^'+d.replace(/\./g, "\\.").replace(/^\\\./, "(.+\\.)?")+'$', 'i');
+					if (d && r.test(hostname) && !r.test(location.hostname))
+						return true;
+				}
+				return false;
+			}
+		}
+	}
+});
