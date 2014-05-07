@@ -17,7 +17,7 @@
  */
 (function(data_analytics) {
 	function clicked(e) {
-		var tag = e.target||e.srcElement;  (tag.nodeType==1)||(tag = t.parentNode);
+		var tag = e.target||e.srcElement;  (tag.nodeType==1)||(tag = tag.parentNode);
 		var dav = data_analytics.values(tag);
 		var a, actiontags = {A:1, AREA:1, BUTTON:1}, i, imp;
 		for (a = tag; a && !(a.tagName in actiontags); a = a.parentNode); //a = ancestor action tag
@@ -81,7 +81,7 @@
 					if (this.isSharedExternalDomain(a.hostname, shared)) {
 						if (e.preventDefault) e.preventDefault();
 						else if (window.event) window.event.returnValue = false;
-						_gaq('_link', a.href);
+						_gaq.push(['_link', a.href]);
 					}
 				}
 			},
