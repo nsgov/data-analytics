@@ -41,7 +41,7 @@
 	 */
 	values: function(tag) {
 		var values={}, attr, t, kv, keycut = /^\s*(\w+)\s*=\s*(.*)\s*$/;
-		for (t=tag; t; t = t.parentNode)  // start with the tag, then go up through its ancestors
+		for (t=tag; t && (t.nodeType==1); t = t.parentNode) // start with tag, then go through ancestors
 			if ((attr = t.getAttribute("data-analytics"))) // for each "k=v", set values[k]=v
 				for (var fields = attr.split(';'), i = fields.length; i--;) 
 					(kv=keycut.exec(fields[i])) && !(kv[1] in values) && (values[kv[1]]=kv[2]);
