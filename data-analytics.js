@@ -62,11 +62,13 @@
 				var keymap = {
 					eventCategory:'category', eventAction:'action', eventLabel:'label', eventValue:'value'
 				};
-				var ga_key, da_key, event = {};
-				for (ga_key in keymap)
-					if ((da_key = keymap[ga_key]) && (da_key in dav))
-						event[ga_key] = dav[da_key];
-				ga('send', 'event', event);
+				if (dav.category && dav.action && dav.label) {
+					var ga_key, da_key, event = {};
+					for (ga_key in keymap)
+						if ((da_key = keymap[ga_key]) && (da_key in dav))
+							event[ga_key] = dav[da_key];
+					ga('send', 'event', event);
+				}
 			}
 		},
 		_gaq: { // old _gaq analytics
