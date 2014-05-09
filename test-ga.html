@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Data-Analytics Test (Universal Anayltics)</title>
+</head>
+
+<body data-analytics="domains=github.com;category=Data-Analytics Test (UA)">
+<h1>Data-Analytics Test (Universal Analytics)</h1>
+
+<ul data-analytics="action=Clicked">
+  <li><a href="cat.gif" data-analytics="label=Cat photo">Cat
+  photo</a></li>
+  <li data-analytics="label=Dog photo"><a href="dog.jpg">Dog
+  photo</a></li>
+  <li><a href="http://github.com/nsgov/data-analytics/">data-analytics
+  on github</a></li>
+  <li><a href="http://google.com/">Some other external link</a></li>
+</ul>
+
+<ol id="log">
+</ol>
+
+<script>
+// disable regular link functionality so we can stick around and read the console log
+function stoplink() { return false; }
+var links = document.getElementsByTagName("a"), len = links.length;
+for (var i = links.length; i--; )
+links[i].onclick = stoplink;
+</script>
+<script>
+// fake analytics.js
+function ga() {
+console.log(arguments);
+ var log = document.getElementById("log");
+var li = log.appendChild(document.createElement("li"));
+var args = [];
+for (var i=0; i < arguments.length; i++) {
+var a = arguments[i];
+switch(typeof(a)) {
+ case 'object': args.push(JSON.stringify(a)); break;
+ case 'function': args.push('(function)'); break;
+ case 'string': args.push('"'+a.replace(/\\/g,"\\\\").replace(/"/g,"\\\"")+'"'); break;
+ default: args.push(String(a));
+}
+}
+li.appendChild(document.createTextNode("ga(" + args.join(", ") + ");"));
+}
+</script>
+<script src="data-analytics.js"></script>
+</body>
+
+</html>
