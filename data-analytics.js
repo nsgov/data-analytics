@@ -28,7 +28,7 @@
 	}
 	for (var i in data_analytics.implementations) {
 		var imp = data_analytics.implementations[i];
-		(imp in window) && imp.init && imp.init(data_analytics);
+		(i in window) && imp.init && imp.init(data_analytics);
 	}
 	if (document.addEventListener)
 		document.addEventListener("click", clicked, false);
