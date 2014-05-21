@@ -26,6 +26,10 @@ A field can also be repeated in the DOM heirarchy, with the deeper element overr
 For event tracking, when a link is clicked data-analytics.js submits the event data to be recorded if
 at least `category`, `action`, and `label` are defined (or inherited) for that link.
 
+
+Cross Domain Linking
+----------------
+
 For sharing analytics over muliple distinct domain names, put a data-analytics attribute on the body tag
 with a `domains` field.  This field is a space-separated list of those shared domains.
 To also include subdomains, prefix the domain name with a dot.
@@ -34,5 +38,11 @@ Subdomains are automatically always included if using Universal Analytics.
 	<!-- eg: -->
 	<body data-analytics="domains=.novascotia.ca .gov.ns.ca">
 
-If using this functionality, the analytics code parameters on the sites will need to set
-'allowLinker' to true.
+If using cross domain functionality, the Google Analytics
+initialization code on the sites will need to set the
+`allowLinker` parameter to true.
+See the
+[analytics.js](https://developers.google.com/analytics/devguides/collection/analyticsjs/cross-domain)
+or
+[ga.js](https://developers.google.com/analytics/devguides/collection/gajs/methods/gaJSApiDomainDirectory#_gat.GA_Tracker_._setAllowLinker)
+documentation for specifics about setting allowLinker.
