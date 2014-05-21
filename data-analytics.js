@@ -1,19 +1,5 @@
-/* data-analytics.js  *  @author David Nordlund  *  © Province of Nova Scotia */
-/* Simplify event tracking and cross domain visits for Google Analytics
- * with unobtrusive javascript.
- * Usage: set data-analytics attributes on html tags.
- * These attributes may contain one or more fields, separated by semi-colons;
- * eg: data-analytics="action=Clicked something;value=8"
- * Fields can be grouped in a single tag, or spread out in the DOM tree.
- * Fields for events are: category, action, label, and value.
- * eg: <ul data-analytics="category=Special Links;action=Clicked">
- *      <li><a href="cat.gif" data-analytics="label=Cat photo"><img...></a></li>
- *      <li><a href="dog.jpg" data-analytics="label=Dog photo"><img...></a></li>
- *      <li><a href="catsanddogs.pdf" data-analytics="action=Downloaded;label=catsanddogs.pdf">...</a></li>
- * For sharing analytics over muliple distinct domain names,
- * the domains field is a space-separated list of those shared domains.
- * To also include subdomains, prefix the domain name with a dot.
- * eg: <body data-analytics="domains=.novascotia.ca .gov.ns.ca">
+/** data-analytics.js  *  @author David Nordlund  *  © Province of Nova Scotia
+ * Simplify event recording and cross domain visits for Google Analytics
  */
 (function(data_analytics) {
 	function clicked(e) {
