@@ -1,8 +1,18 @@
-Usage
-=====
+data-analytics.js
+=================
 
-Set `data-analytics` attributes on html tags.
-These attributes may contain one or more key=value fields, separated by semi-colons;
+data-analytics.js aims to simplify analytics tagging within a page, by
+providing a means of specifying analytics data in purely declarative
+`data-analytics` attributes, instead of requiring click handlers to be
+written.
+This also provides a level of abstraction, allowing data-analytics to
+work on pages using either the ga.js or analytics.js code.
+
+
+Usage
+-----
+
+`data-analytics` attributes may contain one or more key=value fields, separated by semi-colons;
 
 	<!-- eg: -->
 	<a href="something" data-analytics="category=Things;action=Clicked;label=Something">
@@ -28,12 +38,14 @@ at least `category`, `action`, and `label` are defined (or inherited) for that l
 
 
 Cross Domain Linking
-----------------
+--------------------
 
-For sharing analytics over muliple distinct domain names, put a data-analytics attribute on the body tag
-with a `domains` field.  This field is a space-separated list of those shared domains.
+For sharing analytics over muliple distinct domain names, give the
+body tag on both sites a data-analytics attribute with a `domains` field.
+This field is a space-separated list of those shared domains.
 To also include subdomains, prefix the domain name with a dot.
-Subdomains are automatically always included if using Universal Analytics.
+Subdomains are automatically always included if using Universal
+Analytics (analytics.js).
 
 	<!-- eg: -->
 	<body data-analytics="domains=.novascotia.ca .gov.ns.ca">
