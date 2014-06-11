@@ -1,9 +1,9 @@
 /** data-analytics.js  *  @author David Nordlund  *  © Province of Nova Scotia
  * Simplify event recording and cross domain visits for Google Analytics
  */
-(function(data_analytics) {
+(function (data_analytics) {
 	function clicked(e) {
-		var tag = e.target||e.srcElement;  (tag.nodeType==1)||(tag = tag.parentNode);
+		var tag = e.target || e.srcElement;  (tag.nodeType == 1) || (tag = tag.parentNode);
 		var dav = data_analytics.values(tag);
 		var a, actiontags = {A:1, AREA:1, BUTTON:1}, i, imp;
 		for (a = tag; a && !(a.tagName in actiontags); a = a.parentNode); //a = ancestor action tag

@@ -1,7 +1,7 @@
 data-analytics.js
 =================
 
-data-analytics.js aims to simplify analytics tagging within a page, by
+data-analytics.js aims to simplify analytics tagging within a page by
 providing a means of specifying analytics data in purely declarative
 `data-analytics` attributes, instead of requiring click handlers to be
 written.
@@ -33,7 +33,7 @@ A field can also be repeated in the DOM heirarchy, with the deeper element overr
 			<li><a href="dog.jpg" data-analytics="label=Dog"><img src="dog-thumb.jpg" alt="Dog"></a></li>
 			<li><a href="catsanddogs.pdf" data-analytics="action=Downloaded;label=catsanddogs.pdf">...</a></li>
 
-For event tracking, when a link is clicked data-analytics.js submits the event data to be recorded if
+For event tracking, when a link is clicked, data-analytics.js submits the event data to be recorded if:
 at least `category`, `action`, and `label` are defined (or inherited) for that link.
 
 
@@ -44,7 +44,7 @@ For sharing analytics over muliple distinct domain names, give the
 body tag on both sites a data-analytics attribute with a `domains` field.
 This field is a space-separated list of those shared domains.
 To also include subdomains, prefix the domain name with a dot.
-Subdomains are automatically always included if using Universal
+Subdomains are automatically included if using Universal
 Analytics (analytics.js).
 
 	<!-- eg: -->
